@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import './App.css';
 import Navbar from './Components/Navbar';
+import DaiToken from './contract/DaiToken.json';
+import DappToken from './contract/DappToken.json';
+import TokenFarm from './contract/TokenFarm.json';
+import Main from './Components/Main';
+
 
 class App extends Component{
 
@@ -15,6 +20,46 @@ class App extends Component{
 
     const accounts = await web3.eth.getAccounts()
     this.setState({ account : accounts[0]})
+
+    const networkId = await web3.eth.net.getId()
+
+    //load Dai Token
+    const daiTokenData = DaiToken.networks[networkId];
+    if(daiTokenData){
+      const daiToken = new web3.eth.Contract(DaiToken.abi, daiTokenData.address)
+      this.setState({daiToken})
+      let daiTokenBalance = await daiToken.methods.balanceOf(this.state.account).call()
+      this.setState({ daiTokenBalance : daiTokenBalance.toString()})
+      console.log({balance: daiTokenBalance})
+    } else {
+      window.alert('DaiToken contract not deployed to detected network.')
+    }
+
+    //load Dapp Token
+    const dappTokenData = DappToken.networks[networkId];
+    if(dappTokenData){
+      const dappToken = new web3.eth.Contract(DappToken.abi, dappTokenData.address) 
+      this.setState({dappToken})
+      let dappTokenBalance = await dappToken.methods.balanceOf(this.state.account).call()
+      this.setState({ dappTokenBalance : dappTokenBalance.toString()})
+      console.log({balance: dappTokenBalance})
+    } else {
+      window.alert('DaiToken contract not deployed to detected network.')
+    }
+
+
+    //load Token Farm
+    const tokenFarmData = TokenFarm.networks[networkId];
+    if(tokenFarmData){
+      const tokenFarm = new web3.eth.Contract(TokenFarm.abi, tokenFarmData.address) 
+      this.setState({tokenFarm})
+      let stakingBalance = await tokenFarm.methods.stakingBalance(this.state.account).call()
+      this.setState({ stakingBalance : stakingBalance.toString()})
+      console.log({balance: stakingBalance})
+    } else {
+      window.alert('DaiToken contract not deployed to detected network.')
+    }
+    this.setState({ loading : false})
   }
 
   //load web3
@@ -47,6 +92,18 @@ class App extends Component{
   }
 
   render(){
+    let content
+    if(this.state.loading){
+      content = <p id="loader" className="text-center">Loading...</p>
+    } else {
+      content = <Main
+        daiTokenBalance={this.state.daiTokenBalance}
+        dappTokenBalance={this.state.dappTokenBalance}
+        stakingBalance={this.state.stakingBalance}
+        // stakeTokens={this.stakeTokens}
+        // unStakeTokens={this.unStakeTokens}
+      />
+    }
     return (
       <div  className=''>
         <Navbar account={this.state.account} />
@@ -59,7 +116,7 @@ class App extends Component{
                   trarget="_blanck"
                   rel="noopener noreffer"
                   ></a>
-                  <h1>Hello World</h1>
+                  {content}
               </div>
             </main>
           </div>
