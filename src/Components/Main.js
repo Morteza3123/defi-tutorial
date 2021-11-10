@@ -28,27 +28,53 @@ class Main extends Component{
           <div className="card mb-4">
               <div className="card-body">
 
-                  <form className="mb3">
+                  <form className="mb-3" onSubmit={(event)=>{
+                      event.preventDefault()
+                      let amount
+                      amount = this.input.value.toString()
+                      amount = window.web3.utils.toWei(amount, 'Ether')
+                      this.props.stakeTokens(amount)
+                  }}>
+
+
                       <div>
                           <label className="float-left"><b>Stake Tokens</b></label>
-                          <span className="float-right text-muted">
+                          <span className="float-end text-muted">
                               Balance : {window.web3.utils.fromWei(this.props.daiTokenBalance, 'Ether')}
                           </span>
                       </div>
-                      <div className="input groupe mb-4">
-                          <input
-                            type="text"
-                            className="form-control form-control-lg"
-                            placeholder="0"
-                            required />
-                        <div className="input-group-append">
-                            <div className="input-group-text">
-                                <img src={dai} height="32" alt=""/>
-                                &nbsp;&nbsp;&nbsp;  mDai
-                            </div>
-                        </div>
+
+
+                      <div className="input-group mb-4">
+                <input 
+                    type="text"
+                    ref={(input) => { this.input = input}}
+                    className="form-control form-control-lg"
+                    placeholder="0"
+                    required />
+
+
+                <div className="input-group-append">
+                    <div className="input-group-text">
+                        <img src={dai} height='32' alt=""/>
+                        &nbsp;&nbsp;&nbsp; Dai
+                    </div>
+                </div>
+            </div>
+
+                      <div className="d-grid gap-2">
+                             <button type="submit" className="btn btn-primary">Stake!</button>
+                             <button 
+                                type="submit" 
+                                className="btn btn-link btn-block btn-sm"
+                                onClick = {(event) => {
+                                    event.preventDefault()
+                                    this.props.unstakeTokens()
+                                }}
+                             >Un-Stake!</button>
+
                       </div>
-                      <button type="submit" className="btn btn-parimary  btn-block  btn-lg">Stake</button>
+
                   </form>
               </div>
           </div>
